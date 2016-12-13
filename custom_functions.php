@@ -21,8 +21,8 @@ function expire_pmp_membership( $user_login = NULL, $user = NULL ) {
 		// get current user's enddate (String)
 		$enddate = $expired_user->enddate;
 
-		echo "<script>alert('$now');</script>";
-		echo "<script>alert('$enddate');</script>";
+		// echo "<script>alert('$now');</script>";
+		// echo "<script>alert('$enddate');</script>";
 
 		$now_date = date_create($now);
 		$enddate_date = date_create($enddate);
