@@ -27,11 +27,11 @@ function expire_pmp_membership( $user_login = null, $user = null ) {
 			$enddate_date = date_create($enddate);
 
 			// expire user's membership if expire date is not Never & expire date is dued
-			if( ( $enddate != "0000-00-00 00:00:00" ) && ( $now_date > $enddate_date ) ) {
+			if( ( $enddate != "0000-00-00 00:00:00" ) && ( $enddate_date < $now_date ) ) {
 				do_action("pmpro_membership_pre_membership_expiry", $pmp_user->user_id, $pmp_user->membership_id );
 
-				//remove his membership
-				pmpro_changeMembershipLevel(false, $pmp_user->user_id, 'expired');
+				// set his membership to id 9: Not-Yet-Paid
+				pmpro_changeMembershipLevel(9, $pmp_user->user_id);
 
 				do_action("pmpro_membership_post_membership_expiry", $pmp_user->user_id, $pmp_user->membership_id );
 
@@ -53,7 +53,6 @@ function expire_pmp_membership( $user_login = null, $user = null ) {
 			}
 		}
 	}
-	return;
 }
 add_action( 'wp_login', 'expire_pmp_membership', 10, 2 );
 
@@ -61,6 +60,14 @@ add_action( 'wp_login', 'expire_pmp_membership', 10, 2 );
  * Custom: keep members logged in for 1 hour in case their memberships expire.
  */
 function keep_member_logged_in_for_1_hour( $expirein ) {
-    return 86400; // 1 hour in seconds
+	return 3600; // 1 hour in seconds, 60 * 60
 }
 add_filter( 'auth_cookie_expiration', 'keep_member_logged_in_for_1_hour' );
+
+/**
+ * Custom: Add pmp membership "Not-Yet-Paid" to new-registered user
+ */
+function default_pmp_member_level( $user_id ) {
+	pmpro_changeMembershipLevel(9, $user_id);
+}
+add_action( 'user_register', default_pmp_member_level );
